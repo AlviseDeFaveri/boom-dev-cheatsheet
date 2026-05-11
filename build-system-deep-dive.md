@@ -6,7 +6,7 @@ Additional stuff I discovered during long nights of staring at the codebase.
 
 As we said, the build system uses `config`s to let the user define which hardware components to use and how to connect them. Configs are divided into different "fragments" scattered around the codebase. Let's look at the ones used for BOOM:
 
-![alt text](image-5.png)
+![alt text](img/image-5.png)
 
 - We start from `BoomConfigs.scala` (in the [chipyard repo](https://github.com/ucb-bar/chipyard/blob/main/generators/chipyard/src/main/scala/config/BoomConfigs.scala))
 
@@ -143,7 +143,7 @@ This step basically does the following:
 
 All of these instantiations take into account what is defined in the selected config.
 
-![alt text](image-3.png)
+![alt text](img/image-3.png)
 
 The result will be a big Verilog file containing TestHarness as its "top".
 
@@ -230,7 +230,7 @@ Most notably, TOHOST commands are:
 - end of simulation, contains a return code
 - request that a syscall is performed on the host (e.g. printf)
 
-![alt text](image-6.png)
+![alt text](img/image-6.png)
 
 In the binaries we build with chipyard is all handled by "libgloss", so that you can write "printf" in your C program, compile it with libgloss, and as a result the program will:
 
@@ -239,7 +239,7 @@ In the binaries we build with chipyard is all handled by "libgloss", so that you
 - in the meantime, on the host, the `.tohost` region is continuously probed for commands
   - when the `printf` command is seen, the host executes a `printf`
 
-![alt text](image-7.png)
+![alt text](img/image-7.png)
 
 # Future Work
 

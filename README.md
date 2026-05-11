@@ -21,13 +21,13 @@ Useful links:
   - In particular, the Chisel code is here: https://github.com/riscv-boom/riscv-boom/tree/master/src/main/scala
 - Pipeline documentation: https://docs.boom-core.org/en/latest/sections/intro-overview/boom-pipeline.html
 
-![](https://docs.boom-core.org/en/latest/_images/boom-pipeline.svg)
+![alt text](img/image-11.png)
 
 - Hardware components overview (Taken from RocketChip, but basically you can swap "Rocket" with "BOOM").
   - "TileLink" (TL) is the internal, high-speed bus to interconnect cores ("tiles")
   - "AXI" (Advanced Crossbar Interface or something like that) are external buses, e.g. where peripherals and DRAM are connected
 
-![alt text](image-8.png)
+![alt text](img/image-8.png)
 
 ## Chipyard: BOOM's build system
 
@@ -75,9 +75,9 @@ It's not important to understand all of them for now -- you can use this list la
   - `BOOM`: the core we're using
   - `Rocket Chip`: an older, in-order core. Its codebase contains stuff that was later reused for BOOM, e.g. L1 Caches
   - `testchipip`: contains system components (e.g. UART, SPI, JTAG, I2C, PWM) and testing infra
-    <!-- ![alt text](image.png) -->
+    <!-- ![alt text](img/image.png) -->
   - `rocket-chip generators`: other shared components (e.g. caches)
-    <!-- ![alt text](image-1.png) -->
+    <!-- ![alt text](img/image-1.png) -->
 - Software
   - `riscv-tools`: bunch of utils, most interestingly
     - RISCV Compiler & Assembler, now mostly mainline in GCC/LLVM
@@ -124,7 +124,7 @@ This requires also to write a software component with a `main()` function (calle
 
 Once you have (1) you simulation driver and (2) the verilated C++ code, Verilator can compile everything into a binary that you can run on your machine -- no additional hardware needed!
 
-![alt text](image-2.png)
+![alt text](img/image-2.png)
 
 ### Running a RISC-V Program on Verilator
 
