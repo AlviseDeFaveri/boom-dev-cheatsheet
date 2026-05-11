@@ -1,0 +1,61 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="4L5QH3D2mTDgfEYcOsVF" name="Page-1">
+    <mxGraphModel dx="971" dy="589" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="Chisel" vertex="1">
+          <mxGeometry height="60" width="80" x="40" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="Chisel" vertex="1">
+          <mxGeometry height="60" width="80" x="50" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-8" edge="1" parent="1" source="ZgCGS_wwGh6det2X7eb2-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" target="ZgCGS_wwGh6det2X7eb2-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;b&gt;Chisel&lt;/b&gt;&lt;div&gt;Modules&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="80" x="60" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-12" edge="1" parent="1" source="ZgCGS_wwGh6det2X7eb2-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" target="ZgCGS_wwGh6det2X7eb2-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;b&gt;Verilog&lt;/b&gt;&lt;br&gt;Output" vertex="1">
+          <mxGeometry height="60" width="80" x="270" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-13" edge="1" parent="1" source="ZgCGS_wwGh6det2X7eb2-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;dashed=1;" target="ZgCGS_wwGh6det2X7eb2-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;dashed=1;" value="&lt;i&gt;Additional&lt;/i&gt;&lt;div&gt;&lt;i&gt;Verilog&lt;/i&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="80" x="270" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-20" edge="1" parent="1" source="ZgCGS_wwGh6det2X7eb2-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ZgCGS_wwGh6det2X7eb2-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="C++ Testbench" vertex="1">
+          <mxGeometry height="60" width="80" x="440" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-19" edge="1" parent="1" source="ZgCGS_wwGh6det2X7eb2-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ZgCGS_wwGh6det2X7eb2-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;b&gt;C++ &lt;/b&gt;Object" vertex="1">
+          <mxGeometry height="60" width="80" x="440" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-10" parent="1" style="text;whiteSpace=wrap;html=1;fontSize=9;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;div style=&quot;color: rgb(247, 241, 255); background-color: rgb(34, 34, 34); font-weight: normal; white-space: pre; line-height: 150%;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(90, 212, 230); font-style: italic;&quot;&gt;class&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(90, 212, 230);&quot;&gt;Simulator&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;{&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color: rgb(90, 212, 230); font-style: italic;&quot;&gt;void&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(123, 216, 143);&quot;&gt;evaluate&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;();&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color: rgb(90, 212, 230); font-style: italic;&quot;&gt;int&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; clock&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-11" parent="1" style="text;whiteSpace=wrap;html=1;fontSize=9;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;div style=&quot;color: rgb(247, 241, 255); background-color: rgb(34, 34, 34); font-weight: normal; white-space: pre; line-height: 150%;&quot;&gt;&lt;br&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(90, 212, 230); font-style: italic;&quot;&gt;int&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(123, 216, 143);&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;()&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;{&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    Simulator sim&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(105, 103, 108); font-style: italic;&quot;&gt;    // Sim one clock cycle &lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    sim&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;clock &lt;/span&gt;&lt;span style=&quot;color: rgb(252, 97, 141);&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(148, 138, 227);&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    sim&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: rgb(123, 216, 143);&quot;&gt;evaluate&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;();&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    sim&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;clock &lt;/span&gt;&lt;span style=&quot;color: rgb(252, 97, 141);&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(148, 138, 227);&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    sim&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: rgb(123, 216, 143);&quot;&gt;evaluate&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;();&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color: rgb(252, 97, 141);&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color: rgb(247, 241, 255);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: rgb(148, 138, 227);&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(139, 136, 143);&quot;&gt;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="150" x="440" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;fontStyle=2" value="FIRRLT&lt;div&gt;Compiler&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="170" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;fontStyle=2" value="Verilator" vertex="1">
+          <mxGeometry height="40" width="60" x="370" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ZgCGS_wwGh6det2X7eb2-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Fira Code;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DFira%2BCode;" value="&lt;div&gt;&lt;b&gt;Simulation&lt;/b&gt;&lt;/div&gt;&lt;b&gt;Binary&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="80" x="580" y="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
