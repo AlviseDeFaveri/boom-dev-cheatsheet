@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SOURCEDIR     = .
-BUILDDIR      = docs/_build
+BUILDDIR      = docs/build
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -20,12 +20,12 @@ help:
 
 pdf:
 	make latexpdf
-	cp docs/_build/latex/BoomNotes.pdf docs/_static
+	cp docs/build/latex/BoomNotes.pdf docs/_static
 
 livepdf: pdf
-	rm -rf docs/_build/html
-	sphinx-autobuild . docs/_build/html
+	rm -rf docs/build/html
+	sphinx-autobuild . docs/build/html
 
 livehtml:
-	rm -rf docs/_build/html
-	sphinx-autobuild . docs/_build/html
+	rm -rf docs/build/html
+	sphinx-autobuild . docs/build/html

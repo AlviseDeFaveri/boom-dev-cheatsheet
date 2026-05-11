@@ -166,5 +166,5 @@ More info on what happens under the hood can be found in the corresponding deep 
 
 You can check the "deep dive" documents for more info on specific parts:
 
-- [Build System Deep Dive](build-system-deep-dive.md) describes in detail what happens on `make CONFIG=LargeBoomConfig` and when you run a binary
-- [Design Deep Dive](design-deep-dive.md) contains a collection of notes of various parts of the BOOM design
+- [Build System Deep Dive](deep-dives/build-system-deep-dive.md) describes in detail what happens on `make CONFIG=LargeBoomConfig` and when you run a binary
+- [Design Deep Dive](deep-dives/design-deep-dive.md) contains a collection of notes of various parts of the BOOM design

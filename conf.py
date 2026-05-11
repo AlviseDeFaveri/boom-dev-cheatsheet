@@ -66,7 +66,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.venv']
+exclude_patterns = ['docs', 'Thumbs.db', '.DS_Store', '.venv']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "monokai"
@@ -90,7 +90,7 @@ myst_enable_extensions = ["colon_fence"]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['docs/_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -112,8 +112,8 @@ htmlhelp_basename = 'BOOMDevCheatsheet'
 
 html_title = 'BOOM Development Cheatsheet`'
 html_permalinks_icon = ''
-html_logo = '_static/vusec-logo_small-768x768.png'
-html_favicon = '_static/vusec-logo_small-128x128.png'
+html_logo = 'docs/_static/vusec-logo_small-768x768.png'
+html_favicon = 'docs/_static/vusec-logo_small-128x128.png'
 
 
 html_theme = 'sphinx_rtd_theme'
