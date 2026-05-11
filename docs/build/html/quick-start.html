@@ -109,12 +109,12 @@ Verilog or physical implementation (maybe we’ll get there at some point).</p>
 mechanisms developed at Berkeley. It’s written in Chisel.</p>
 <p>Useful links:</p>
 <ul class="simple">
-<li><p>Source code: https://github.com/riscv-boom/riscv-boom</p>
+<li><p>Source code: <a class="reference external" href="https://github.com/riscv-boom/riscv-boom">https://github.com/riscv-boom/riscv-boom</a></p>
 <ul>
-<li><p>In particular, the Chisel code is here: https://github.com/riscv-boom/riscv-boom/tree/master/src/main/scala</p></li>
+<li><p>In particular, the Chisel code is here: <a class="reference external" href="https://github.com/riscv-boom/riscv-boom/tree/master/src/main/scala">https://github.com/riscv-boom/riscv-boom/tree/master/src/main/scala</a></p></li>
 </ul>
 </li>
-<li><p>Pipeline documentation: https://docs.boom-core.org/en/latest/sections/intro-overview/boom-pipeline.html</p></li>
+<li><p>Pipeline documentation: <a class="reference external" href="https://docs.boom-core.org/en/latest/sections/intro-overview/boom-pipeline.html">https://docs.boom-core.org/en/latest/sections/intro-overview/boom-pipeline.html</a></p></li>
 </ul>
 <p><img alt="alt text" src="_images/image-11.png" /></p>
 <ul class="simple">
@@ -131,7 +131,7 @@ mechanisms developed at Berkeley. It’s written in Chisel.</p>
 <h2>Chipyard: BOOM’s build system<a class="headerlink" href="#chipyard-boom-s-build-system" title="Link to this heading"></a></h2>
 <p>A CPU is much more than just the core – think CSRs, peripherals, bus interfaces
 to memory, a Boot ROM, a debug interface, and many other components.</p>
-<p>To orchestrate these systems in a modular way, Berkeley chips use Chipyard: https://chipyard.readthedocs.io/.</p>
+<p>To orchestrate these systems in a modular way, Berkeley chips use Chipyard: <a class="reference external" href="https://chipyard.readthedocs.io/">https://chipyard.readthedocs.io/</a>.</p>
 <section id="quickstart">
 <h3>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h3>
 <p>Something like this should work out-of-the box:</p>
@@ -165,7 +165,7 @@ make<span class="w"> </span><span class="nv">CONFIG</span><span class="o">=</spa
 </section>
 <section id="available-components">
 <h3>Available Components<a class="headerlink" href="#available-components" title="Link to this heading"></a></h3>
-<p>This page describes all components available in Chipyard: https://chipyard.readthedocs.io/en/latest/Chipyard-Basics/Chipyard-Components.html</p>
+<p>This page describes all components available in Chipyard: <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Chipyard-Basics/Chipyard-Components.html">https://chipyard.readthedocs.io/en/latest/Chipyard-Basics/Chipyard-Components.html</a></p>
 <p>It’s not important to understand all of them for now – you can use this list later when you dig into the code. The relevant ones for us are:</p>
 <ul>
 <li><p>Hardware</p>
@@ -220,7 +220,7 @@ programming)</p></li>
 </li>
 <li><p>Chisel is transpiled to Verilog via the FIRRTL compiler</p>
 <ul class="simple">
-<li><p><strong>FYI:</strong> You can actually have some components written in “raw” Verilog (Verilog Black-Boxing https://chipyard.readthedocs.io/en/latest/Customization/Incorporating-Verilog-Blocks.html)</p></li>
+<li><p><strong>FYI:</strong> You can actually have some components written in “raw” Verilog (Verilog Black-Boxing <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Customization/Incorporating-Verilog-Blocks.html">https://chipyard.readthedocs.io/en/latest/Customization/Incorporating-Verilog-Blocks.html</a>)</p></li>
 <li><p><strong>FYI:</strong> In Verilog itself, you can also have modules that are defined in Verilog but implemented in C (something similar to <code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">C</span></code> in C++). This mechanism is called <code class="docutils literal notranslate"><span class="pre">DPI-C</span></code>, and of course only works in software simulations.</p></li>
 </ul>
 </li>
@@ -247,12 +247,12 @@ programming)</p></li>
 <h3>Running a RISC-V Program on Verilator<a class="headerlink" href="#running-a-risc-v-program-on-verilator" title="Link to this heading"></a></h3>
 <p>The Chipyard docs contain a quick guide on:</p>
 <ul>
-<li><p>How to run the default example https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#simulating-the-default-example</p>
+<li><p>How to run the default example <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#simulating-the-default-example">https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#simulating-the-default-example</a></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./simulator-chipyard.harness-LargeBoomV3Config<span class="w"> </span><span class="nv">$RISCV</span>/riscv64-unknown-elf/share/riscv-tests/isa/rv64ui-p-simple
 </pre></div>
 </div>
 </li>
-<li><p>How to run a custom test program https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#custom-benchmarks-tests</p>
+<li><p>How to run a custom test program <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#custom-benchmarks-tests">https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#custom-benchmarks-tests</a></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enter Tests directory</span>
 <span class="nb">cd</span><span class="w"> </span>tests
 make
@@ -263,14 +263,14 @@ make<span class="w"> </span>run-binary<span class="w"> </span><span class="nv">B
 </pre></div>
 </div>
 <ul>
-<li><p>When using verilator you can use this to skip quite a lot of useless cycles https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#fast-memory-loading</p>
+<li><p>When using verilator you can use this to skip quite a lot of useless cycles <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#fast-memory-loading">https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#fast-memory-loading</a></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run-binary<span class="w"> </span><span class="nv">BINARY</span><span class="o">=</span>test.riscv<span class="w"> </span><span class="nv">LOADMEM</span><span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 </li>
 </ul>
 </li>
-<li><p>More info on how these programs are built in a way that “just works” for the simulator https://chipyard.readthedocs.io/en/latest/Software/Baremetal.html</p>
+<li><p>More info on how these programs are built in a way that “just works” for the simulator <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Software/Baremetal.html">https://chipyard.readthedocs.io/en/latest/Software/Baremetal.html</a></p>
 <ul class="simple">
 <li><p>Basically programs are compiled with the libgloss-htif library that enables writing programs with simple syscalls (like <code class="docutils literal notranslate"><span class="pre">printf</span></code>) and running them without the need of a fully booted OS</p></li>
 </ul>

@@ -71,7 +71,10 @@ exclude_patterns = ['docs', 'Thumbs.db', '.DS_Store', '.venv']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "monokai"
 
-myst_enable_extensions = ["colon_fence"]
+myst_enable_extensions = [
+    "colon_fence",
+    "linkify",
+]
 
 
 # -- Options for HTML output -------------------------------------------------

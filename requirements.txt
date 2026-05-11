@@ -12,6 +12,7 @@ h11==0.14.0
 idna==3.7
 imagesize==1.4.1
 Jinja2==3.1.4
+linkify-it-py==2.1.0
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdit-py-plugins==0.4.0
@@ -42,6 +43,7 @@ sphinxcontrib-qthelp==1.0.7
 sphinxcontrib-serializinghtml==1.1.10
 starlette==0.37.2
 typing_extensions==4.11.0
+uc-micro-py==2.0.0
 urllib3==2.2.1
 uvicorn==0.29.0
 watchfiles==0.21.0

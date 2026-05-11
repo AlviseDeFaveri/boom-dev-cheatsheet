@@ -152,7 +152,7 @@
 </pre></div>
 </div>
 </li>
-<li><p>Note that the BootROM contents can be found here https://github.com/ucb-bar/testchipip/blob/5dca05bef9a9d7b135e18543379bc782df80ce40/src/main/resources/testchipip/bootrom/bootrom.S</p></li>
+<li><p>Note that the BootROM contents can be found here <a class="reference external" href="https://github.com/ucb-bar/testchipip/blob/5dca05bef9a9d7b135e18543379bc782df80ce40/src/main/resources/testchipip/bootrom/bootrom.S">https://github.com/ucb-bar/testchipip/blob/5dca05bef9a9d7b135e18543379bc782df80ce40/src/main/resources/testchipip/bootrom/bootrom.S</a></p></li>
 </ul>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">WithNLargeBooms</span></code> is defined in the <a class="reference external" href="https://github.com/riscv-boom/riscv-boom/blob/master/src/main/scala/v3/common/config-mixins.scala">boom repo</a>. Note that anything starting with “With” is called a <em>config mixin</em>, and be defined in either the BOOM repo or the RocketChip repo (or any other generator repo for that matter).</p>
@@ -205,7 +205,7 @@
 <section id="building-the-verilated-simulation-deep-dive">
 <h2>Building the Verilated Simulation – Deep Dive<a class="headerlink" href="#building-the-verilated-simulation-deep-dive" title="Link to this heading"></a></h2>
 <p>Our quick start suggested to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CONFIG=LargeBoomV3Config</span></code>.</p>
-<p>The complete list of makefile variables can be found here: https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#makefile-variables-and-commands.</p>
+<p>The complete list of makefile variables can be found here: <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#makefile-variables-and-commands">https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#makefile-variables-and-commands</a>.</p>
 <p>The default values for these variables can be found in the chipyard repo, in <code class="docutils literal notranslate"><span class="pre">variables.mk</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>	SBT_PROJECT       ?= chipyard
 	MODEL             ?= TestHarness
@@ -247,7 +247,7 @@ into a C++ object.</p>
 <li><p>Together with <em>generating</em> C code that represents the verilog source, verilator also transfers a bunch of C++ sources that implement Verilog modules used only during simulation (see previous comment on DPI-C)</p></li>
 </ul>
 </li>
-<li><p>The default C++ simulation driver can be found in https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/emulator.cc</p></li>
+<li><p>The default C++ simulation driver can be found in <a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/emulator.cc">https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/emulator.cc</a></p></li>
 <li><p>Finally, Verilator generates a <code class="docutils literal notranslate"><span class="pre">VTestHarness.mk</span></code> which is invoked to compile TestHarness + DPI-C code + simulation driver into a single binary</p></li>
 </ul>
 <p>The name of the output binary is defined in <code class="docutils literal notranslate"><span class="pre">sims/verilator/Makefile</span></code> as</p>
