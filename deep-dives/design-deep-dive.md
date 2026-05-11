@@ -87,7 +87,7 @@ rob_uop(rob_tail)       := io.enq_uops(w)
 
 Cheatsheet of what info are extracted at decode time.
 
-![alt text](img/image-9.png)
+![alt text](../img/image-9.png)
 
 ## Virtual Memory
 

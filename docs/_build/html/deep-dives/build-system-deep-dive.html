@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build System Deep Dive &mdash; BOOM Development Cheatsheet`</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+      <link rel="stylesheet" type="text/css" href="../_static/rtd-custom.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Design Deep Dive" href="design-deep-dive.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            BOOM Development Cheatsheet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">“Quick” Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design-deep-dive.html">Design Deep Dive</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Build System Deep Dive</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#chipyard-configs-deep-dive">Chipyard Configs – Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-verilated-simulation-deep-dive">Building the Verilated Simulation – Deep Dive</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chisel-to-verilog">Chisel to Verilog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#verilog-c-binary">Verilog → C++ → Binary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#running-risc-v-programs-deep-dive">Running RISC-V Programs – Deep Dive</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dtm-module">DTM Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#htif-protocol">HTIF Protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#future-work">Future Work</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BOOM Development Cheatsheet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Build System Deep Dive</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/deep-dives/build-system-deep-dive.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="build-system-deep-dive">
+<h1>Build System Deep Dive<a class="headerlink" href="#build-system-deep-dive" title="Link to this heading"></a></h1>
+<p>Additional stuff I discovered during long nights of staring at the codebase.</p>
+<section id="chipyard-configs-deep-dive">
+<h2>Chipyard Configs – Deep Dive<a class="headerlink" href="#chipyard-configs-deep-dive" title="Link to this heading"></a></h2>
+<p>As we said, the build system uses <code class="docutils literal notranslate"><span class="pre">config</span></code>s to let the user define which hardware components to use and how to connect them. Configs are divided into different “fragments” scattered around the codebase. Let’s look at the ones used for BOOM:</p>
+<p><img alt="alt text" src="../_images/image-5.png" /></p>
+<ul>
+<li><p>We start from <code class="docutils literal notranslate"><span class="pre">BoomConfigs.scala</span></code> (in the <a class="reference external" href="https://github.com/ucb-bar/chipyard/blob/main/generators/chipyard/src/main/scala/config/BoomConfigs.scala">chipyard repo</a>)</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">LargeBoomV3Config</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nf">Config</span><span class="p">(</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">boom</span><span class="p">.</span><span class="na">v3</span><span class="p">.</span><span class="na">common</span><span class="p">.</span><span class="na">WithNLargeBooms</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">config</span><span class="p">.</span><span class="na">WithSystemBusWidth</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">config</span><span class="p">.</span><span class="na">AbstractConfig</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>NOTE</strong> Configs are applied bottom to top</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AbstractConfig</span></code> is defined <a class="reference external" href="https://github.com/ucb-bar/chipyard/blob/main/generators/chipyard/src/main/scala/config/AbstractConfig.scala">here</a> and makes sure that all the off-core components are included in the design (e.g. BootROM, SystemBus, Periphery Bus, Memory Bus, inclusive caches, IO Cells, peripherals etc ). It instantiates also the <code class="docutils literal notranslate"><span class="pre">TestHarness</span></code> part of the chip, which is only used when testing the device. Here’s an overview (most parts are omitted since the config is quite big)</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">AbstractConfig</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nf">Config</span><span class="p">(</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">harness</span><span class="p">.</span><span class="na">WithUARTAdapter</span><span class="w"> </span><span class="o">++</span><span class="w">   </span><span class="c1">// Fake UART module that prints values to stdio</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">harness</span><span class="p">.</span><span class="na">WithBlackBoxSimMem</span><span class="w"> </span><span class="o">++</span><span class="w">  </span><span class="c1">// Fake DRAM that simulates loading and storing</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">harness</span><span class="p">.</span><span class="na">WithSimTSIOverSerialTL</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="c1">// &quot;Tethered Serial Interface&quot;</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">harness</span><span class="p">.</span><span class="na">WithClockFromHarness</span><span class="w"> </span><span class="o">++</span><span class="w">  </span><span class="c1">// clock controlled by harness</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">harness</span><span class="p">.</span><span class="na">WithResetFromHarness</span><span class="w"> </span><span class="o">++</span><span class="w">  </span><span class="c1">// reset controlled by harness</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">chipyard</span><span class="p">.</span><span class="na">config</span><span class="p">.</span><span class="na">WithBootROM</span><span class="w"> </span><span class="o">++</span><span class="w">  </span><span class="c1">// use default bootrom</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">testchipip</span><span class="p">.</span><span class="na">boot</span><span class="p">.</span><span class="na">WithBootAddrReg</span><span class="w"> </span><span class="o">++</span><span class="w">   </span><span class="c1">// add a boot-addr-reg for configurable boot address</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">freechips</span><span class="p">.</span><span class="na">rocketchip</span><span class="p">.</span><span class="na">subsystem</span><span class="p">.</span><span class="na">WithNExtTopInterrupts</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">++</span><span class="w">    </span><span class="c1">// external interrupts</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">testchipip</span><span class="p">.</span><span class="na">soc</span><span class="p">.</span><span class="na">WithMbusScratchpad</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x08000000</span><span class="p">,</span><span class="w">     </span><span class="c1">// add 64 KiB on-chip scratchpad</span>
+<span class="w">                                            </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">)</span><span class="w"> </span><span class="o">++</span>
+
+<span class="w">    </span><span class="c1">// ** omitted **</span>
+
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">freechips</span><span class="p">.</span><span class="na">rocketchip</span><span class="p">.</span><span class="na">system</span><span class="p">.</span><span class="na">BaseConfig</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">freechips.rocketchip.system.BaseConfig</span></code> can be found <a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/scala/system/Configs.scala">here</a></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">BaseConfig</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nf">Config</span><span class="p">(</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithDefaultMemPort</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithDefaultMMIOPort</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithDefaultSlavePort</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithTimebase</span><span class="p">(</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">1000000</span><span class="p">))</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="c1">// 1 MHz</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithDTS</span><span class="p">(</span><span class="s">&quot;freechips,rocketchip-unknown&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Nil</span><span class="p">)</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithNExtTopInterrupts</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">++</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">BaseSubsystemConfig</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BaseSubsystemConfig</span></code> can be found <a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/scala/subsystem/Configs.scala">here</a></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">BaseSubsystemConfig</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nf">Config</span><span class="w"> </span><span class="p">((</span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">here</span><span class="p">,</span><span class="w"> </span><span class="n">up</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="n">BootROMLocated</span><span class="p">(</span><span class="n">InSubsystem</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Seq</span><span class="p">(</span><span class="n">BootROMParams</span><span class="p">(</span><span class="n">contentFileName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SystemFileName</span><span class="p">(</span><span class="s">&quot;./bootrom/bootrom.img&quot;</span><span class="p">)))</span>
+<span class="w">  </span><span class="c1">// ** other configs omitted **</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note that the BootROM contents can be found here https://github.com/ucb-bar/testchipip/blob/5dca05bef9a9d7b135e18543379bc782df80ce40/src/main/resources/testchipip/bootrom/bootrom.S</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WithNLargeBooms</span></code> is defined in the <a class="reference external" href="https://github.com/riscv-boom/riscv-boom/blob/master/src/main/scala/v3/common/config-mixins.scala">boom repo</a>. Note that anything starting with “With” is called a <em>config mixin</em>, and be defined in either the BOOM repo or the RocketChip repo (or any other generator repo for that matter).</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nf">WithNLargeBooms</span><span class="p">(</span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="n">Int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nf">Config</span><span class="p">(</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">WithTAGELBPD</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="c1">// Default to TAGE-L BPD</span>
+<span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">Config</span><span class="p">((</span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">here</span><span class="p">,</span><span class="w"> </span><span class="n">up</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">TilesLocated</span><span class="p">(</span><span class="n">InSubsystem</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">val</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">up</span><span class="p">(</span><span class="n">TilesLocated</span><span class="p">(</span><span class="n">InSubsystem</span><span class="p">),</span><span class="w"> </span><span class="n">site</span><span class="p">)</span>
+<span class="w">      </span><span class="n">val</span><span class="w"> </span><span class="n">idOffset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">up</span><span class="p">(</span><span class="n">NumTiles</span><span class="p">)</span>
+<span class="w">      </span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="n">until</span><span class="w"> </span><span class="n">n</span><span class="p">).</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">        </span><span class="n">BoomTileAttachParams</span><span class="p">(</span>
+<span class="w">          </span><span class="n">tileParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BoomTileParams</span><span class="p">(</span>
+<span class="w">            </span><span class="n">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BoomCoreParams</span><span class="p">(</span>
+<span class="w">              </span><span class="n">fetchWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">              </span><span class="n">decodeWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">              </span><span class="n">numRobEntries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span>
+<span class="w">              </span><span class="n">issueParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Seq</span><span class="p">(</span>
+<span class="w">                </span><span class="n">IssueParams</span><span class="p">(</span><span class="n">issueWidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">numEntries</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">iqType</span><span class="o">=</span><span class="n">IQT_MEM</span><span class="p">.</span><span class="na">litValue</span><span class="p">,</span><span class="w"> </span><span class="n">dispatchWidth</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">                </span><span class="n">IssueParams</span><span class="p">(</span><span class="n">issueWidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">numEntries</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="n">iqType</span><span class="o">=</span><span class="n">IQT_INT</span><span class="p">.</span><span class="na">litValue</span><span class="p">,</span><span class="w"> </span><span class="n">dispatchWidth</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">                </span><span class="n">IssueParams</span><span class="p">(</span><span class="n">issueWidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">numEntries</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="n">iqType</span><span class="o">=</span><span class="n">IQT_FP</span><span class="p">.</span><span class="na">litValue</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">dispatchWidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+<span class="w">              </span><span class="n">numIntPhysRegisters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+<span class="w">              </span><span class="n">numFpPhysRegisters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span>
+<span class="w">              </span><span class="n">numLdqEntries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span>
+<span class="w">              </span><span class="n">numStqEntries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span>
+<span class="w">              </span><span class="n">maxBrCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">              </span><span class="n">numFetchBufferEntries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span>
+<span class="w">              </span><span class="n">ftq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FtqParameters</span><span class="p">(</span><span class="n">nEntries</span><span class="o">=</span><span class="mi">32</span><span class="p">),</span>
+<span class="w">              </span><span class="n">fpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Some</span><span class="p">(</span><span class="n">freechips</span><span class="p">.</span><span class="na">rocketchip</span><span class="p">.</span><span class="na">tile</span><span class="p">.</span><span class="na">FPUParams</span><span class="p">(</span><span class="n">sfmaLatency</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">dfmaLatency</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">divSqrt</span><span class="o">=</span><span class="kc">true</span><span class="p">))</span>
+<span class="w">            </span><span class="p">),</span>
+<span class="w">            </span><span class="n">dcache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Some</span><span class="p">(</span>
+<span class="w">              </span><span class="n">DCacheParams</span><span class="p">(</span><span class="n">rowBits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="n">nSets</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">nWays</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">nMSHRs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">nTLBWays</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="w">            </span><span class="p">),</span>
+<span class="w">            </span><span class="n">icache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Some</span><span class="p">(</span>
+<span class="w">              </span><span class="n">ICacheParams</span><span class="p">(</span><span class="n">rowBits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="n">nSets</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">nWays</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">fetchBytes</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span>
+<span class="w">            </span><span class="p">),</span>
+<span class="w">            </span><span class="n">tileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">idOffset</span>
+<span class="w">          </span><span class="p">),</span>
+<span class="w">          </span><span class="n">crossingParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RocketCrossingParams</span><span class="p">()</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">prev</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">NumTiles</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">up</span><span class="p">(</span><span class="n">NumTiles</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="building-the-verilated-simulation-deep-dive">
+<h2>Building the Verilated Simulation – Deep Dive<a class="headerlink" href="#building-the-verilated-simulation-deep-dive" title="Link to this heading"></a></h2>
+<p>Our quick start suggested to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CONFIG=LargeBoomV3Config</span></code>.</p>
+<p>The complete list of makefile variables can be found here: https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#makefile-variables-and-commands.</p>
+<p>The default values for these variables can be found in the chipyard repo, in <code class="docutils literal notranslate"><span class="pre">variables.mk</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>	SBT_PROJECT       ?= chipyard
+	MODEL             ?= TestHarness
+	VLOG_MODEL        ?= $(MODEL)
+	MODEL_PACKAGE     ?= chipyard.harness
+	CONFIG            ?= RocketConfig
+	CONFIG_PACKAGE    ?= $(SBT_PROJECT)
+	GENERATOR_PACKAGE ?= $(SBT_PROJECT)
+	TB                ?= TestDriver
+	TOP               ?= ChipTop
+</pre></div>
+</div>
+<section id="chisel-to-verilog">
+<h3>Chisel to Verilog<a class="headerlink" href="#chisel-to-verilog" title="Link to this heading"></a></h3>
+<p>The Chisel → Verilog step is defined in <code class="docutils literal notranslate"><span class="pre">common.mk</span></code> (target named <code class="docutils literal notranslate"><span class="pre">verilog</span></code>).
+This step basically does the following:</p>
+<ul class="simple">
+<li><p>Instantiates <code class="docutils literal notranslate"><span class="pre">TestHarness</span></code>, which is defined as the “MODEL” in the Makefile</p></li>
+<li><p><strong>TestHarness</strong> instantiates <strong>ChipTop</strong></p></li>
+<li><p>ChipTop instantiates <strong>DigitalTop</strong></p>
+<ul>
+<li><p>DigitalTop inherits from System</p></li>
+<li><p>System inherits from SubSystem</p></li>
+</ul>
+</li>
+</ul>
+<p>All of these instantiations take into account what is defined in the selected config.</p>
+<p><img alt="alt text" src="../_images/image-3.png" /></p>
+<p>The result will be a big Verilog file containing TestHarness as its “top”.</p>
+</section>
+<section id="verilog-c-binary">
+<h3>Verilog → C++ → Binary<a class="headerlink" href="#verilog-c-binary" title="Link to this heading"></a></h3>
+<p>The “Verilation” step is the act of using Verilator to transform the Verilog source
+into a C++ object.</p>
+<ul class="simple">
+<li><p>verilator is invoked in <code class="docutils literal notranslate"><span class="pre">sims/verilator/makefile</span></code></p>
+<ul>
+<li><p>This will generate <em>a lot</em> of files. <code class="docutils literal notranslate"><span class="pre">VTestHarness.h</span></code> will contain the simulation object used by the testbench</p></li>
+<li><p>Together with <em>generating</em> C code that represents the verilog source, verilator also transfers a bunch of C++ sources that implement Verilog modules used only during simulation (see previous comment on DPI-C)</p></li>
+</ul>
+</li>
+<li><p>The default C++ simulation driver can be found in https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/emulator.cc</p></li>
+<li><p>Finally, Verilator generates a <code class="docutils literal notranslate"><span class="pre">VTestHarness.mk</span></code> which is invoked to compile TestHarness + DPI-C code + simulation driver into a single binary</p></li>
+</ul>
+<p>The name of the output binary is defined in <code class="docutils literal notranslate"><span class="pre">sims/verilator/Makefile</span></code> as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sim_prefix = simulator
+sim = $(sim_dir)/$(sim_prefix)-$(MODEL_PACKAGE)-$(CONFIG)
+</pre></div>
+</div>
+<p>Which in our case will results in</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sims</span><span class="o">/</span><span class="n">verilator</span><span class="o">/</span><span class="n">simulator</span><span class="o">-</span><span class="n">chipyard</span><span class="o">.</span><span class="n">harness</span><span class="o">-</span><span class="n">LargeBoomConfig</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="running-risc-v-programs-deep-dive">
+<h2>Running RISC-V Programs – Deep Dive<a class="headerlink" href="#running-risc-v-programs-deep-dive" title="Link to this heading"></a></h2>
+<p>The default testbench that gets compiled when you <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CONFIG=LargeBoomV3Config</span></code> reads a RISC-V ELF binary, whose path is provided to the command line, and “runs” it. But actually, there’s a lot going on under the hood.</p>
+<p>Starting from RocketChip’s <code class="docutils literal notranslate"><span class="pre">emulator.cc</span></code> (which can be found <a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/emulator.cc">here</a>)</p>
+<ol class="arabic simple">
+<li><p>Command-line args are parsed and used to initialize the DTM module</p></li>
+</ol>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">dtm_t</span><span class="p">(</span><span class="n">htif_argc</span><span class="p">,</span><span class="w"> </span><span class="n">htif_argv</span><span class="p">);</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Simulation object is built an initialized</p></li>
+</ol>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_HARNESS</span><span class="w"> </span><span class="o">*</span><span class="n">tile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TEST_HARNESS</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>A success signal is waited for, either from the DTM module or the hardware itself (see <code class="docutils literal notranslate"><span class="pre">TestDriver.v</span></code>).</p></li>
+</ol>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">trace_count</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">max_cycles</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">done_reset</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">dtm</span><span class="o">-&gt;</span><span class="n">done</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">jtag</span><span class="o">-&gt;</span><span class="n">done</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">tile</span><span class="o">-&gt;</span><span class="n">io_success</span><span class="p">))</span>
+<span class="w">      </span><span class="k">break</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>But what does this DTM module do?</p>
+<section id="dtm-module">
+<h3>DTM Module<a class="headerlink" href="#dtm-module" title="Link to this heading"></a></h3>
+<p>The Debug Transfer Module (DTM) is</p>
+<ul class="simple">
+<li><p>initialized in <code class="docutils literal notranslate"><span class="pre">emulator.cc</span></code></p></li>
+<li><p>defined in C inside of the FESVR (Front-End Server) code, which resides in the <a class="reference external" href="https://github.com/riscv-software-src/riscv-isa-sim/blob/9c190a07c6838f6392bafa4ad83acea462c7f759/fesvr/dtm.h">riscv-isa-sim</a> code</p></li>
+<li><p>used in <a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/vsrc/SimDTM.v"><code class="docutils literal notranslate"><span class="pre">SimDTM.v</span></code></a>, a “black-box” component of <code class="docutils literal notranslate"><span class="pre">rocket-chip</span></code> that is implemented in C (<a class="reference external" href="https://github.com/chipsalliance/rocket-chip/blob/8f1e33b253e3bce741861c0a2e3ba8b7ff85b292/src/main/resources/csrc/SimDTM.cc">SimDTM.cc</a>)</p>
+<ul>
+<li><p>this is connected to the ChipTop by chipyard’s <a class="reference internal" href="#chipyard/src/main/scala/HarnessBinders.scala"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">HarnessBinders</span></code></span></a></p></li>
+</ul>
+</li>
+</ul>
+<p>This hardware component basically implements the communication between the “outside world” (host) and the simulated design (target).</p>
+<p>Communication between these two worlds follows the HTIF protocol (Berkeley Host-Target Interface).</p>
+</section>
+<section id="htif-protocol">
+<h3>HTIF Protocol<a class="headerlink" href="#htif-protocol" title="Link to this heading"></a></h3>
+<p>This is what devs have to say of the HTIF protocol:</p>
+<blockquote>
+<div><p>The HTIF is the Host/Target Interface, which has the front-end server (riscv-fesvr, running on your host computer) communicating with the target design (Sodor). The riscv-fesvr loads the binary into the Target memory via the HTIF mem ports, and then uses the Control/Status Registers to bring the core out of reset. Once the program is finished, the Target tells the riscv-fesvr it is finished via the tohost CSR and simulation ends.</p>
+<p>HTIF is a non-standard tool for Berkeley processors, so there’s no documentation on it. It is going to disappear soon, as the RISC-V platform spec is released and the cores are updated to be self-hosting.</p>
+</div></blockquote>
+<p>Basically the HTIF protocol defines that the communication between host and guest can be done using two memory regions:</p>
+<ul class="simple">
+<li><p>a <code class="docutils literal notranslate"><span class="pre">.fromhost</span></code> memory region that contains data coming from the outside world</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">.tohost</span></code> memory region where data is sent to the driver</p></li>
+</ul>
+<p>Most notably, TOHOST commands are:</p>
+<ul class="simple">
+<li><p>end of simulation, contains a return code</p></li>
+<li><p>request that a syscall is performed on the host (e.g. printf)</p></li>
+</ul>
+<p><img alt="alt text" src="../_images/image-6.png" /></p>
+<p>In the binaries we build with chipyard is all handled by “libgloss”, so that you can write “printf” in your C program, compile it with libgloss, and as a result the program will:</p>
+<ul class="simple">
+<li><p>write a specific code to the <code class="docutils literal notranslate"><span class="pre">.tohost</span></code> region</p></li>
+<li><p>wait that the <code class="docutils literal notranslate"><span class="pre">.fromhost</span></code> region contains the result</p></li>
+<li><p>in the meantime, on the host, the <code class="docutils literal notranslate"><span class="pre">.tohost</span></code> region is continuously probed for commands</p>
+<ul>
+<li><p>when the <code class="docutils literal notranslate"><span class="pre">printf</span></code> command is seen, the host executes a <code class="docutils literal notranslate"><span class="pre">printf</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="alt text" src="../_images/image-7.png" /></p>
+</section>
+</section>
+<section id="future-work">
+<h2>Future Work<a class="headerlink" href="#future-work" title="Link to this heading"></a></h2>
+<p>While most projects don’t really require this level of in-depth information,
+it was useful for me to remove a bunch of stuff when building the simulation,
+to make fuzzing <em>much</em> faster.</p>
+<p>In general, the Phantom Trails repo contains a deeply debloated version of
+this build system that we might want to Dockerize and maybe give to students
+at some point?</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="design-deep-dive.html" class="btn btn-neutral float-left" title="Design Deep Dive" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Alvise de Faveri Tron.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

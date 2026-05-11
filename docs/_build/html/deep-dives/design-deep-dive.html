@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Deep Dive &mdash; BOOM Development Cheatsheet`</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+      <link rel="stylesheet" type="text/css" href="../_static/rtd-custom.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Build System Deep Dive" href="build-system-deep-dive.html" />
+    <link rel="prev" title="“Quick” Start" href="../quick-start.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            BOOM Development Cheatsheet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">“Quick” Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Design Deep Dive</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#predictors">Predictors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lsq">LSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pnr">PNR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#decoder">Decoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#virtual-memory">Virtual Memory</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="build-system-deep-dive.html">Build System Deep Dive</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BOOM Development Cheatsheet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Design Deep Dive</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/deep-dives/design-deep-dive.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="design-deep-dive">
+<h1>Design Deep Dive<a class="headerlink" href="#design-deep-dive" title="Link to this heading"></a></h1>
+<p>Various notes about parts of the codebase, we could restructure them a bit.</p>
+<section id="predictors">
+<h2>Predictors<a class="headerlink" href="#predictors" title="Link to this heading"></a></h2>
+<p>BOOM uses a TAGE (tournament) predictor that contains multiple predictors chained
+one after the other, and can choose to prioritize one or another by observing
+their predictions and then seeing from the misprediction signal if someone
+was correct.</p>
+<p>Here you can see how they are connected.</p>
+<div class="highlight-scala notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">*  Branch prediction configs below</span>
+<span class="cm">*/</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WithTAGELBPD</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nc">Config</span><span class="p">((</span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">here</span><span class="p">,</span><span class="w"> </span><span class="n">up</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="k">case</span><span class="w"> </span><span class="nc">TilesLocated</span><span class="p">(</span><span class="nc">InSubsystem</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">up</span><span class="p">(</span><span class="nc">TilesLocated</span><span class="p">(</span><span class="nc">InSubsystem</span><span class="p">),</span><span class="w"> </span><span class="n">site</span><span class="p">)</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">tp</span><span class="p">:</span><span class="w"> </span><span class="nc">BoomTileAttachParams</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">tp</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="n">tileParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tp</span><span class="p">.</span><span class="n">tileParams</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="n">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tp</span><span class="p">.</span><span class="n">tileParams</span><span class="p">.</span><span class="n">core</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span>
+<span class="w">    </span><span class="n">bpdMaxMetaLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span>
+<span class="w">    </span><span class="n">globalHistoryLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span>
+<span class="w">    </span><span class="n">localHistoryLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="n">localHistoryNSets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">branchPredictor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">resp_in</span><span class="p">:</span><span class="w"> </span><span class="nc">BranchPredictionBankResponse</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">:</span><span class="w"> </span><span class="nc">Parameters</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">loop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">LoopBranchPredictorBank</span><span class="p">()(</span><span class="n">p</span><span class="p">))</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">tage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">TageBranchPredictorBank</span><span class="p">()(</span><span class="n">p</span><span class="p">))</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">btb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">BTBBranchPredictorBank</span><span class="p">()(</span><span class="n">p</span><span class="p">))</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">bim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">BIMBranchPredictorBank</span><span class="p">()(</span><span class="n">p</span><span class="p">))</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">ubtb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">FAMicroBTBBranchPredictorBank</span><span class="p">()(</span><span class="n">p</span><span class="p">))</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="n">preds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Seq</span><span class="p">(</span><span class="n">loop</span><span class="p">,</span><span class="w"> </span><span class="n">tage</span><span class="p">,</span><span class="w"> </span><span class="n">btb</span><span class="p">,</span><span class="w"> </span><span class="n">ubtb</span><span class="p">,</span><span class="w"> </span><span class="n">bim</span><span class="p">)</span>
+<span class="w">        </span><span class="n">preds</span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">_</span><span class="p">.</span><span class="n">io</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nc">DontCare</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">ubtb</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp_in</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span><span class="n">resp_in</span>
+<span class="w">        </span><span class="n">bim</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp_in</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">   </span><span class="o">:=</span><span class="w"> </span><span class="n">ubtb</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp</span>
+<span class="w">        </span><span class="n">btb</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp_in</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">   </span><span class="o">:=</span><span class="w"> </span><span class="n">bim</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp</span>
+<span class="w">        </span><span class="n">tage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp_in</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span><span class="n">btb</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp</span>
+<span class="w">        </span><span class="n">loop</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp_in</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span><span class="n">tage</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp</span>
+
+<span class="w">        </span><span class="p">(</span><span class="n">preds</span><span class="p">,</span><span class="w"> </span><span class="n">loop</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">resp</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">)))</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">other</span>
+<span class="p">}</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="lsq">
+<h2>LSQ<a class="headerlink" href="#lsq" title="Link to this heading"></a></h2>
+<p>// TODO: some interesting stuff about LSQ, maybe students can do writeups about this</p>
+</section>
+<section id="pnr">
+<h2>PNR<a class="headerlink" href="#pnr" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>3.10.5 Point of No Return (PNR)</p>
+<p>The point-of-no-return head runs ahead of the ROB commit head, marking the next instruction which might be misspeculated or generate an exception. These include unresolved branches and untranslated memory operations. Thus,
+the instructions ahead of the commit head and behind the PNR head are guaranteed to be non-speculative, even if they
+have not yet written back</p>
+</div></blockquote>
+<p>rob.scala:704</p>
+<div class="highlight-scala notranslate"><div class="highlight"><pre><span></span><span class="kd">val</span><span class="w"> </span><span class="o">**</span><span class="n">unsafe_entry_in_rob</span><span class="o">**</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">**</span><span class="n">rob_unsafe_masked</span><span class="o">**</span><span class="p">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">_||_</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="n">next_rob_pnr_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Mux</span><span class="p">(</span><span class="n">unsafe_entry_in_rob</span><span class="p">,</span>
+<span class="w">                               </span><span class="nc">AgePriorityEncoder</span><span class="p">(</span><span class="n">rob_unsafe_masked</span><span class="p">,</span><span class="w"> </span><span class="n">rob_head_idx</span><span class="p">),</span>
+<span class="w">                               </span><span class="n">rob_tail</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">log2Ceil</span><span class="p">(</span><span class="n">coreWidth</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nc">PriorityEncoder</span><span class="p">(</span><span class="o">~</span><span class="n">rob_tail_vals</span><span class="p">.</span><span class="n">asUInt</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>rob.scala:490</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">**</span><span class="n">rob_unsafe_masked</span><span class="o">**</span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">log2Ceil</span><span class="p">(</span><span class="n">coreWidth</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">w</span><span class="p">)</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">**</span><span class="n">rob_val</span><span class="o">**</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="o">**</span><span class="n">rob_unsafe</span><span class="o">**</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">**</span><span class="n">rob_exception</span><span class="o">**</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>rob.scala:325</p>
+<div class="highlight-scala notranslate"><div class="highlight"><pre><span></span><span class="n">rob_bsy</span><span class="p">(</span><span class="n">rob_tail</span><span class="p">)</span><span class="w">       </span><span class="o">:=</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">enq_uops</span><span class="p">(</span><span class="n">w</span><span class="p">).</span><span class="n">is_fence</span><span class="w"> </span><span class="o">||</span>
+<span class="w">                                   </span><span class="n">io</span><span class="p">.</span><span class="n">enq_uops</span><span class="p">(</span><span class="n">w</span><span class="p">).</span><span class="n">is_fencei</span><span class="p">)</span>
+<span class="o">**</span><span class="n">rob_unsafe</span><span class="o">**</span><span class="p">(</span><span class="n">rob_tail</span><span class="p">)</span><span class="w">    </span><span class="o">:=</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">enq_uops</span><span class="p">(</span><span class="n">w</span><span class="p">).</span><span class="o">**</span><span class="n">unsafe</span><span class="o">**</span>
+<span class="n">rob_uop</span><span class="p">(</span><span class="n">rob_tail</span><span class="p">)</span><span class="w">       </span><span class="o">:=</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">enq_uops</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="o">**</span><span class="n">rob_exception</span><span class="o">**</span><span class="p">(</span><span class="n">rob_tail</span><span class="p">)</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">enq_uops</span><span class="p">(</span><span class="n">w</span><span class="p">).</span><span class="o">**</span><span class="n">exception</span><span class="o">**</span>
+</pre></div>
+</div>
+</section>
+<section id="decoder">
+<h2>Decoder<a class="headerlink" href="#decoder" title="Link to this heading"></a></h2>
+<p>Cheatsheet of what info are extracted at decode time.</p>
+<p><img alt="alt text" src="../_images/image-9.png" /></p>
+</section>
+<section id="virtual-memory">
+<h2>Virtual Memory<a class="headerlink" href="#virtual-memory" title="Link to this heading"></a></h2>
+<p>// TODO, maybe describe the minimal setup we had for PhantomTrails?</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../quick-start.html" class="btn btn-neutral float-left" title="“Quick” Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build-system-deep-dive.html" class="btn btn-neutral float-right" title="Build System Deep Dive" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Alvise de Faveri Tron.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

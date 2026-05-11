@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>“Quick” Start &mdash; BOOM Development Cheatsheet`</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b20cc3f5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+      <link rel="stylesheet" type="text/css" href="_static/rtd-custom.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/design-tabs.js?v=36754332"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Design Deep Dive" href="deep-dives/design-deep-dive.html" />
+    <link rel="prev" title="BOOM Development Cheatsheet" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BOOM Development Cheatsheet
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">“Quick” Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#boom-documentation">BOOM Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chipyard-boom-s-build-system">Chipyard: BOOM’s build system</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#available-components">Available Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#what-does-it-mean-to-build-a-hardware-project">What does it mean to “build” a hardware project?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-with-verilator">Testing with Verilator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#running-a-risc-v-program-on-verilator">Running a RISC-V Program on Verilator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-on-fpga">Testing on FPGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deep-dives">Deep Dives</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deep-dives/design-deep-dive.html">Design Deep Dive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deep-dives/build-system-deep-dive.html">Build System Deep Dive</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BOOM Development Cheatsheet</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">“Quick” Start</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quick-start.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-start">
+<h1>“Quick” Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
+<p>This guide is a collection of notes taken during previous projects on BOOM.</p>
+<p>Its intended audience is Master/PhD students of VuSec that want to either (1)
+build a fuzzing harness (then you’re interested in the build system) or (2) implement
+some special kind of security feature on the core, test that it works in simulation
+and benchmark its overhead.</p>
+<p>It is <strong>not</strong> intended to give a complete background on hardware design, Chisel,
+Verilog or physical implementation (maybe we’ll get there at some point).</p>
+<section id="boom-documentation">
+<h2>BOOM Documentation<a class="headerlink" href="#boom-documentation" title="Link to this heading"></a></h2>
+<p>BOOM is an open-source core with an out-of-order pipeline and speculation
+mechanisms developed at Berkeley. It’s written in Chisel.</p>
+<p>Useful links:</p>
+<ul class="simple">
+<li><p>Source code: https://github.com/riscv-boom/riscv-boom</p>
+<ul>
+<li><p>In particular, the Chisel code is here: https://github.com/riscv-boom/riscv-boom/tree/master/src/main/scala</p></li>
+</ul>
+</li>
+<li><p>Pipeline documentation: https://docs.boom-core.org/en/latest/sections/intro-overview/boom-pipeline.html</p></li>
+</ul>
+<p><img alt="alt text" src="_images/image-11.png" /></p>
+<ul class="simple">
+<li><p>Hardware components overview (Taken from RocketChip, but basically you can swap “Rocket” with “BOOM”).</p>
+<ul>
+<li><p>“TileLink” (TL) is the internal, high-speed bus to interconnect cores (“tiles”)</p></li>
+<li><p>“AXI” (Advanced Crossbar Interface or something like that) are external buses, e.g. where peripherals and DRAM are connected</p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="alt text" src="_images/image-8.png" /></p>
+</section>
+<section id="chipyard-boom-s-build-system">
+<h2>Chipyard: BOOM’s build system<a class="headerlink" href="#chipyard-boom-s-build-system" title="Link to this heading"></a></h2>
+<p>A CPU is much more than just the core – think CSRs, peripherals, bus interfaces
+to memory, a Boot ROM, a debug interface, and many other components.</p>
+<p>To orchestrate these systems in a modular way, Berkeley chips use Chipyard: https://chipyard.readthedocs.io/.</p>
+<section id="quickstart">
+<h3>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h3>
+<p>Something like this should work out-of-the box:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download the template and setup environment</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ucb-bar/chipyard.git
+<span class="nb">cd</span><span class="w"> </span>chipyard
+./scripts/init-submodules-no-riscv-tools.sh
+
+<span class="c1"># build the sofware toolchain</span>
+./scripts/build-toolchains.sh<span class="w"> </span>riscv-tools
+
+<span class="c1"># add RISCV to env, update PATH and LD_LIBRARY_PATH env vars</span>
+<span class="c1"># note: env.sh generated by build-toolchains.sh</span>
+<span class="nb">source</span><span class="w"> </span>env.sh
+
+<span class="c1"># generate a simulation for LargeBOOMConfig</span>
+<span class="nb">cd</span><span class="w"> </span>sims/verilator
+make<span class="w"> </span><span class="nv">CONFIG</span><span class="o">=</span>LargeBoomConfig
+</pre></div>
+</div>
+<p>If this ends without errors, the <code class="docutils literal notranslate"><span class="pre">sims/verilator</span></code> folder should now contain:</p>
+<ul class="simple">
+<li><p>a <code class="docutils literal notranslate"><span class="pre">generated-src</span></code> folder that contains</p>
+<ul>
+<li><p>verilog sources, generated from Chisel</p></li>
+<li><p>C++ sources, generated by Verilator</p></li>
+</ul>
+</li>
+<li><p>new binary called something like <code class="docutils literal notranslate"><span class="pre">simulator-chipyard.harness-LargeBoomConfig</span></code> that runs a cycle-accurate simulation of the selected config (more on how to run <a class="reference external" href="https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#custom-benchmarks-tests">here</a>)</p></li>
+</ul>
+</section>
+<section id="available-components">
+<h3>Available Components<a class="headerlink" href="#available-components" title="Link to this heading"></a></h3>
+<p>This page describes all components available in Chipyard: https://chipyard.readthedocs.io/en/latest/Chipyard-Basics/Chipyard-Components.html</p>
+<p>It’s not important to understand all of them for now – you can use this list later when you dig into the code. The relevant ones for us are:</p>
+<ul>
+<li><p>Hardware</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">BOOM</span></code>: the core we’re using</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rocket</span> <span class="pre">Chip</span></code>: an older, in-order core. Its codebase contains stuff that was later reused for BOOM, e.g. L1 Caches</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">testchipip</span></code>: contains system components (e.g. UART, SPI, JTAG, I2C, PWM) and testing infra</p>
+<!-- ![alt text](img/image.png) -->
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rocket-chip</span> <span class="pre">generators</span></code>: other shared components (e.g. caches)</p>
+<!-- ![alt text](img/image-1.png) -->
+</li>
+</ul>
+</li>
+<li><p>Software</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">riscv-tools</span></code>: bunch of utils, most interestingly</p>
+<ul>
+<li><p>RISCV Compiler &amp; Assembler, now mostly mainline in GCC/LLVM</p></li>
+<li><p>bootloader &amp; proxy kernel, used to run bare-metal programs without booting up a full Linux Kernel</p></li>
+<li><p>ISA simulator (Spike), a software implementation of what each instruction should do</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verilator</span></code> a cycle-accurate simulator that “runs” your hardware completely in software (more about this later)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="what-does-it-mean-to-build-a-hardware-project">
+<h2>What does it mean to “build” a hardware project?<a class="headerlink" href="#what-does-it-mean-to-build-a-hardware-project" title="Link to this heading"></a></h2>
+<p>This section tries to describe what happens under the hood when you run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>sims/verilator
+make<span class="w"> </span><span class="nv">CONFIG</span><span class="o">=</span>LargeBoomV3Config
+</pre></div>
+</div>
+<p>Modern hardware is typically developed writing <em>code</em>. There
+are particular programming languages for this, called HDLs (hardware description
+languages):</p>
+<ul class="simple">
+<li><p>VHDL, Verilog and SystemVerilog are considered “low-level” HDLs (~like C for
+programming)</p></li>
+<li><p>Chisel is considered a higher-level HDL (~like Java)</p></li>
+</ul>
+<p>Chipyard’s workflow looks something like this:</p>
+<ol class="arabic simple">
+<li><p>Hardware components are written in Chisel</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config</span></code> fragments define which components to use in a given design and how to connect them together</p>
+<ul class="simple">
+<li><p>The “top” component (called <code class="docutils literal notranslate"><span class="pre">DigitalTop</span></code> in Chipyard) is like a “main” function in C</p></li>
+</ul>
+</li>
+<li><p>Chisel is transpiled to Verilog via the FIRRTL compiler</p>
+<ul class="simple">
+<li><p><strong>FYI:</strong> You can actually have some components written in “raw” Verilog (Verilog Black-Boxing https://chipyard.readthedocs.io/en/latest/Customization/Incorporating-Verilog-Blocks.html)</p></li>
+<li><p><strong>FYI:</strong> In Verilog itself, you can also have modules that are defined in Verilog but implemented in C (something similar to <code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">C</span></code> in C++). This mechanism is called <code class="docutils literal notranslate"><span class="pre">DPI-C</span></code>, and of course only works in software simulations.</p></li>
+</ul>
+</li>
+<li><p>Once you have the Verilog source, you can either:</p>
+<ul class="simple">
+<li><p><em>synthesize</em> to an FPGA</p>
+<ul>
+<li><p>This generates a <em>bitstream</em> that you need to flash on your FPGA</p></li>
+<li><p>Note that this is several orders of magnitude faster than software simulation</p></li>
+</ul>
+</li>
+<li><p>build a <em>software simulation</em> using Verilator (a process called “Verilation”)</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="testing-with-verilator">
+<h2>Testing with Verilator<a class="headerlink" href="#testing-with-verilator" title="Link to this heading"></a></h2>
+<p>Verilator basically transforms your Verilog code into a C++ object where each member represents a wire in the design (more or less) and a public <code class="docutils literal notranslate"><span class="pre">eval()</span></code> function is exposed to drive the simulation with the current inputs.</p>
+<p>This requires also to write a software component with a <code class="docutils literal notranslate"><span class="pre">main()</span></code> function (called a “simulation driver” or a “testbench”) that drives the simulation, i.e. literally sets the clock to <code class="docutils literal notranslate"><span class="pre">1</span></code>, calls <code class="docutils literal notranslate"><span class="pre">eval()</span></code>, sets the clock to <code class="docutils literal notranslate"><span class="pre">0</span></code> and calls <code class="docutils literal notranslate"><span class="pre">eval()</span></code> again.</p>
+<p>Once you have (1) you simulation driver and (2) the verilated C++ code, Verilator can compile everything into a binary that you can run on your machine – no additional hardware needed!</p>
+<p><img alt="alt text" src="_images/image-2.png" /></p>
+<section id="running-a-risc-v-program-on-verilator">
+<h3>Running a RISC-V Program on Verilator<a class="headerlink" href="#running-a-risc-v-program-on-verilator" title="Link to this heading"></a></h3>
+<p>The Chipyard docs contain a quick guide on:</p>
+<ul>
+<li><p>How to run the default example https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#simulating-the-default-example</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./simulator-chipyard.harness-LargeBoomV3Config<span class="w"> </span><span class="nv">$RISCV</span>/riscv64-unknown-elf/share/riscv-tests/isa/rv64ui-p-simple
+</pre></div>
+</div>
+</li>
+<li><p>How to run a custom test program https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#custom-benchmarks-tests</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enter Tests directory</span>
+<span class="nb">cd</span><span class="w"> </span>tests
+make
+
+<span class="c1"># Enter Verilator or VCS directory</span>
+<span class="nb">cd</span><span class="w"> </span>../sims/verilator
+make<span class="w"> </span>run-binary<span class="w"> </span><span class="nv">BINARY</span><span class="o">=</span>../../tests/hello.riscv
+</pre></div>
+</div>
+<ul>
+<li><p>When using verilator you can use this to skip quite a lot of useless cycles https://chipyard.readthedocs.io/en/latest/Simulation/Software-RTL-Simulation.html#fast-memory-loading</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run-binary<span class="w"> </span><span class="nv">BINARY</span><span class="o">=</span>test.riscv<span class="w"> </span><span class="nv">LOADMEM</span><span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>More info on how these programs are built in a way that “just works” for the simulator https://chipyard.readthedocs.io/en/latest/Software/Baremetal.html</p>
+<ul class="simple">
+<li><p>Basically programs are compiled with the libgloss-htif library that enables writing programs with simple syscalls (like <code class="docutils literal notranslate"><span class="pre">printf</span></code>) and running them without the need of a fully booted OS</p></li>
+</ul>
+</li>
+</ul>
+<p>More info on what happens under the hood can be found in the corresponding deep dive of this guide.</p>
+</section>
+</section>
+<section id="testing-on-fpga">
+<h2>Testing on FPGA<a class="headerlink" href="#testing-on-fpga" title="Link to this heading"></a></h2>
+<p>// TODO</p>
+</section>
+<section id="deep-dives">
+<h2>Deep Dives<a class="headerlink" href="#deep-dives" title="Link to this heading"></a></h2>
+<p>You can check the “deep dive” documents for more info on specific parts:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#build-system-deep-dive.md"><span class="xref myst">Build System Deep Dive</span></a> describes in detail what happens on <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CONFIG=LargeBoomConfig</span></code> and when you run a binary</p></li>
+<li><p><a class="reference internal" href="#design-deep-dive.md"><span class="xref myst">Design Deep Dive</span></a> contains a collection of notes of various parts of the BOOM design</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="BOOM Development Cheatsheet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deep-dives/design-deep-dive.html" class="btn btn-neutral float-right" title="Design Deep Dive" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Alvise de Faveri Tron.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
